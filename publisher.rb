@@ -19,18 +19,16 @@ app = ->(env) do
   uuid = SecureRandom.uuid
   serialize = [request.request_method, request.fullpath, request.headers, request.body.read]
 
-  
-  response = nil
-  redis.subscribe(uuid) do |on|
-    on.message do |channel, msg|
-      response = JSON.parse(msg)
-      redis.unsubscribe
-    end
+  redis.rpush "requests", [ uuid, serialize ].to_json
+  uuid, payload = redis.blpop "response/#{uuid}"
 
-    redis.rpush "requests", [ uuid, serialize ].to_json
-  end
-
-  response
+  JSON.parse(payload)
 end
+
+static = ->(env) do
+   ['200', {'Content-Type' => 'text/html'}, ['A barebones rack app.']]
+end
+
+
  
-Rack::Handler::WEBrick.run app
+Rack::Handler::WEBrick.run ENV['REDIS'] ? app : static

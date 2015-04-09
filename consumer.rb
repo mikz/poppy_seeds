@@ -7,5 +7,5 @@ while job = redis.blpop('requests')
   list, element = job
   uuid, request = JSON.parse(element)
 
-  redis.publish uuid, ['200', {'Content-Type' => 'text/html'}, ['A barebones rack app.']].to_json
+  redis.lpush "response/#{uuid}", ['200', {'Content-Type' => 'text/html'}, ['A barebones rack app.']].to_json
 end
