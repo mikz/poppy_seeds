@@ -1,4 +1,10 @@
 
+
+if redis_disabled then
+	ngx.print "redis not enabled"
+	return
+end
+
 local redis = require 'resty.redis'
 local cjson = require 'cjson'
 local resty_uuid  = require 'resty.uuid'
