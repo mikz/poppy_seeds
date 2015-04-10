@@ -113,3 +113,44 @@ Percentage of the requests served within a certain time (ms)
   99%      7
  100%     42 (longest request)
  ```
+
+
+# ngx_openresty
+
+```
+Server Software:        openresty/1.7.10.1
+Server Hostname:        127.0.0.1
+Server Port:            8080
+
+Document Path:          /
+Document Length:        21 bytes
+
+Concurrency Level:      1
+Time taken for tests:   4.970 seconds
+Complete requests:      5000
+Failed requests:        0
+Total transferred:      895000 bytes
+HTML transferred:       105000 bytes
+Requests per second:    1006.08 [#/sec] (mean)
+Time per request:       0.994 [ms] (mean)
+Time per request:       0.994 [ms] (mean, across all concurrent requests)
+Transfer rate:          175.87 [Kbytes/sec] received
+
+Connection Times (ms)
+              min  mean[+/-sd] median   max
+Connect:        0    0   0.1      0       7
+Processing:     0    1   0.2      1       9
+Waiting:        0    1   0.1      1       3
+Total:          0    1   0.2      1       9
+
+Percentage of the requests served within a certain time (ms)
+  50%      1
+  66%      1
+  75%      1
+  80%      1
+  90%      1
+  95%      1
+  98%      1
+  99%      2
+ 100%      9 (longest request)
+```
