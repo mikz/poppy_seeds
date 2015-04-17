@@ -195,3 +195,22 @@ Percentage of the requests served within a certain time (ms)
   99%      1
  100%      3 (longest request)
 ```
+
+
+# Vegeta
+
+3 ruby workers
+2 openresty workers
+1 vegeta with 900rps
+
+```
+echo "GET http://127.0.0.1:8080/" | vegeta attack -rate=900 -duration=60s | vegeta report
+Requests	[total]				54000
+Duration	[total, attack, wait]		1m38.136652506s, 1m38.135945601s, 706.905µs
+Latencies	[mean, 50, 95, 99, max]		2.021016ms, 1.982573ms, 3.367939ms, 100.03849ms, 100.03849ms
+Bytes In	[total, mean]			1134000, 21.00
+Bytes Out	[total, mean]			0, 0.00
+Success		[ratio]				100.00%
+Status Codes	[code:count]			200:54000
+Error Set:
+```

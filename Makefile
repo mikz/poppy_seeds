@@ -1,10 +1,10 @@
+URL = http://127.0.0.1:8080/
 
-URL = 127.0.0.1:8080
 ruby:
 	$(MAKE) -j2 ruby-worker ruby-server
 
 ruby-worker:
-	ruby worker.rb
+	ruby worker.rb -n 3
 
 ruby-server: SERVER = thin
 ruby-server:
@@ -14,8 +14,14 @@ ruby-server:
 nginx-server:
 	nginx -p . -c server.conf
 
-benchmark:
-	ab -n 5000 http://$(URL)/
+benchmark: ab
+
+ab:
+	ab -n 5000 $(URL)
+
+vegeta: DURATION = 60s
+vegeta:
+	 echo "GET $(URL)" | vegeta attack -rate=900 -duration=$(DURATION) | vegeta report
 
 test:
 	curl -v $(URL)
