@@ -20,7 +20,7 @@ OptionParser.new do |opts|
   end
 end.parse!
 
-$protocol = Protocol.new(Redis.new)
+$protocol = Protocol.server(Redis.new)
 
 def protocol
   $protocol
