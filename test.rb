@@ -51,46 +51,57 @@ def process(uuids)
   end
 end
 
-worker = $stdin.isatty ? 'ruby worker.rb' : ARGF.read
+@worker = $stdin.isatty ? 'ruby worker.rb' : ARGF.read
 requests = options.fetch(:requests)
 warmup = options.fetch(:warmup)
 
 uuids = []
 
-puts "Will test: #{worker}"
+puts "Will test: #{@worker}"
 
+
+def start_worker
+  $worker ||= begin
+    pid = spawn(@worker)
+    puts "Started worker: #{@worker} (pid: #{pid})"
+    pid
+  end
+end
 
 protocol.reset
 
-puts "Enqueuing #{warmup} warmup requests"
-time = benchmark { uuids.concat enqueue_requests(warmup) }
-puts "Enqueued #{warmup} warmup requests in #{time}"
+at_exit {
+  Process.kill('QUIT', $worker) if $worker
+  Process.waitall
+}
 
-unless uuids.size == (enqueued = protocol.requests)
-  puts "Enqueued #{warmup} but found #{enqueued}. Exiting."
-  exit 1
+if warmup > 0
+  puts "Enqueuing #{warmup} warmup requests"
+  time = benchmark { uuids.concat enqueue_requests(warmup) }
+  puts "Enqueued #{warmup} warmup requests in #{time}"
+
+  unless uuids.size == (enqueued = protocol.requests)
+    puts "Enqueued #{warmup} but found #{enqueued}. Exiting."
+    exit 1
+  end
+
+  start_worker
+
+  time = benchmark do
+    process(uuids)
+  end
+
+
+  puts "Took #{time} to process #{warmup} warmup requests"
 end
-
-time = benchmark do
-  $worker = spawn(worker)
-  at_exit {
-    Process.kill('QUIT', $worker)
-    Process.waitall
-  }
-
-  puts "Started worker: #{worker} (pid: #{$worker})"
-
-  process(uuids)
-end
-
-
-puts "Took #{time} to process #{warmup} warmup requests"
 
 ## Real benchmark
 puts "Enqueuing #{requests} requests"
 time = benchmark { uuids.concat enqueue_requests(requests) }
 
 puts "Enqueued #{requests} requests in #{time}"
+
+start_worker
 
 time = benchmark do
   process(uuids)
