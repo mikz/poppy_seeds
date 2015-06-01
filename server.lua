@@ -18,7 +18,13 @@ assert(red:connect("127.0.0.1", 6379))
 
 -- red:set_timeout(0) -- 1 sec
 
+ngx.req.read_body()
+
 local request = {
+	path = ngx.var.uri,
+	method = ngx.var.request_method,
+	headers = ngx.req.get_headers(),
+	body = ngx.req.get_post_args()
 }
 
 local uuid = resty_uuid.generate()
