@@ -6,3 +6,4 @@ gem 'pry'
 gem 'rack'
 
 gem 'benchmark-ips'
+gem 'ffi-rzmq'
