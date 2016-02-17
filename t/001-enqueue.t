@@ -1,4 +1,12 @@
 use Test::Nginx::Socket 'no_plan';
+use Cwd qw(cwd);
+
+
+my $pwd = cwd();
+
+our $HttpConfig = qq{
+    lua_package_path "$pwd/?.lua;;";
+};
 
 repeat_each(100);
 run_tests();
@@ -8,8 +16,7 @@ __DATA__
 === TEST 1: hello, world
 This is just a simple demonstration of the
 echo directive provided by ngx_http_echo_module.
---- http_config
-lua_package_path ';;';
+--- http_config eval: $::HttpConfig
 --- config
 location = /t {
     content_by_lua_file '/Users/mikz/Developer/poppy-seeds/disque.lua';
