@@ -8,6 +8,16 @@ our $HttpConfig = qq{
     lua_package_path "$pwd/?.lua;;";
 };
 
+our $server_pid;
+
+unless ($server_pid = fork) {
+	exec("resty disque-server.lua");
+}
+
+add_cleanup_handler(sub {
+    kill INT => $server_pid;
+});
+
 repeat_each(100);
 run_tests();
 
