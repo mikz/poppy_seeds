@@ -9,7 +9,7 @@ while true do
 
   assert(disque.ack(job_id))
 
-  local response = { 200, { ['Status'] = 'OK' }, { job_id } }
+  local response = { 200, { ['Status'] = 'OK', ['X-Request-ID'] = job_id }, { job_id } }
 
   assert(disque.push(job_id, response))
 

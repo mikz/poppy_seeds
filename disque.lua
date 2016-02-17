@@ -60,6 +60,8 @@ _M.call = function()
     ngx.header[h] = v
   end
 
+  assert(headers['X-Request-ID'] == job_id, 'job_id does not match')
+
   ngx.print(body)
   ngx.exit(status)
 end
