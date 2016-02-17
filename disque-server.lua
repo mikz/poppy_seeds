@@ -1,43 +1,17 @@
-local redis = require 'resty.redis'
-local cjson = require 'cjson'
+local disque = require 'disque'
 
-redis.add_commands(
-  "addjob", "getjob", "ackjob",
-  "fastack", "working", "nack",
-  "hello", "qlen", "qstat",
-  "qpeek", "enqueue", "dequeue",
-  "deljob", "show", "qscan",
-  "jscan", "pause"
-)
+assert(disque.connect())
 
-
-local red = redis:new()
-
-assert(red:connect("127.0.0.1", 7711))
-
-
--- consider using ngx.req.get_body_data() instead
--- local request = { ngx.req.get_method(), ngx.req.get_headers(), ngx.var.request_body }
-local request = { 'GET', { ['Host'] = 'example.com' }, 'body' }
-
--- red:set_keepalive(10000, 100)
 while true do
-  local res, err = red:getjob('from', 'poppy-seeds')
 
-  if err then
-  	ngx.say(err)
-  	ngx.exit(500)
-  end
+  local job_id, request = disque.pop('poppy-seeds') 
+  local method, headers, body = unpack(request)
 
-  res = unpack(res)
-
-  local queue, job_id, payload = unpack(res)
-  local request = cjson.decode(payload)
-  assert(red:ackjob(job_id))
+  assert(disque.ack(job_id))
 
   local response = { 200, { ['Status'] = 'OK' }, { job_id } }
 
-  local job_id,err = red:addjob(job_id, cjson.encode(response), 100)
+  assert(disque.push(job_id, response))
 
   ngx.say(job_id)
 end

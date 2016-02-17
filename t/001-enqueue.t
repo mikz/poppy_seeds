@@ -1,4 +1,4 @@
-use Test::Nginx::Socket 'no_plan';
+use Test::Nginx::Socket::Lua 'no_plan';
 use Cwd qw(cwd);
 
 
@@ -18,7 +18,7 @@ add_cleanup_handler(sub {
     kill INT => $server_pid;
 });
 
-repeat_each(100);
+repeat_each(20);
 run_tests();
 
 __DATA__
@@ -29,7 +29,7 @@ echo directive provided by ngx_http_echo_module.
 --- http_config eval: $::HttpConfig
 --- config
 location = /t {
-    content_by_lua_file '/Users/mikz/Developer/poppy-seeds/disque.lua';
+    content_by_lua_block { require('disque').call() }
 }
 --- request
 GET /t
