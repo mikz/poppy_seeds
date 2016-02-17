@@ -1,5 +1,6 @@
 use Test::Nginx::Socket 'no_plan';
 
+repeat_each(100);
 run_tests();
 
 __DATA__
@@ -15,6 +16,8 @@ location = /t {
 }
 --- request
 GET /t
+--- response_headers
+Status: OK
 --- response_body_like chomp
 ^D\-\w{8}\-.{24}\-\w{4}$
 --- error_code: 200

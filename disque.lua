@@ -24,6 +24,17 @@ local request = { 'GET', { ['Host'] = 'example.com' }, 'body' }
 
 local job_id,err = red:addjob('poppy-seeds', cjson.encode(request), 100)
 
-local queue, job, payload = red:getjob('from', job_id)
+local res, err = red:getjob('from', job_id)
 
-ngx.print(job_id)
+local job = unpack(res)
+
+local queue, job_id, payload = unpack(job)
+
+local status, headers, body = unpack(cjson.decode(payload))
+
+for h, v in pairs(headers) do
+	ngx.header[h] = v
+end
+
+ngx.print(body)
+ngx.exit(status)

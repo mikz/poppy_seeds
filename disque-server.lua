@@ -24,16 +24,18 @@ local request = { 'GET', { ['Host'] = 'example.com' }, 'body' }
 while true do
   local res, err = red:getjob('from', 'poppy-seeds')
 
-  res = unpack(res)
   if err then
   	ngx.say(err)
   	ngx.exit(500)
   end
 
+  res = unpack(res)
+
   local queue, job_id, payload = unpack(res)
   local request = cjson.decode(payload)
+  assert(red:ackjob(job_id))
 
-  local response = { 200, { ['Status'] = 'OK' }, { 'body', 'part 2' } } 
+  local response = { 200, { ['Status'] = 'OK' }, { job_id } }
 
   local job_id,err = red:addjob(job_id, cjson.encode(response), 100)
 
