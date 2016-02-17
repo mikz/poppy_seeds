@@ -18,7 +18,7 @@ add_cleanup_handler(sub {
     kill INT => $server_pid;
 });
 
-repeat_each(20);
+repeat_each(100);
 run_tests();
 
 __DATA__
