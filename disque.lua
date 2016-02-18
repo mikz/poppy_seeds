@@ -14,14 +14,13 @@ local _M = {}
 local red
 
 -- this is really shitty way to do it, but keepalive does not work
-_M.connect = function(host, port) 
+_M.connect = function(host, port)
   red = redis:new()
   return red:connect(host or "127.0.0.1", port or 7711)
 end
 
 _M.push = function(queue, data)
   assert(queue, 'missing queue parameter')
-  
   local payload = cjson.encode(data)
 
   local job_id,err = assert(red:addjob(queue, payload, 100))
@@ -34,14 +33,15 @@ _M.request = function()
   return { 'GET', { ['Host'] = 'example.com' }, {'body'} }
 end
 
-_M.ack = function(job_id) 
+_M.ack = function(job_id)
   return red:ackjob(job_id)
 end
 
-_M.pop = function(queue) 
+_M.pop = function(queue)
     assert(queue, 'missing queue parameter')
 
     local res, err = assert(red:getjob('from', queue))
+
     local job = unpack(res)
     local queue, job_id, payload = unpack(job)
 
@@ -55,12 +55,15 @@ _M.call = function()
 
   local response_id, response =  _M.pop(job_id)
   local status, headers, body = unpack(response)
-  
-  for h, v in pairs(headers) do
+
+   for h, v in pairs(headers) do
     ngx.header[h] = v
   end
 
   assert(headers['X-Request-ID'] == job_id, 'job_id does not match')
+
+  -- We should ack the response_id to avoid leaving active jobs.
+  _M.ack(response_id)
 
   ngx.print(body)
   ngx.exit(status)
