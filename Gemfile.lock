@@ -3,6 +3,11 @@ GEM
   specs:
     benchmark-ips (2.2.0)
     coderay (1.1.0)
+    ffi (1.9.10)
+    ffi-rzmq (2.0.4)
+      ffi-rzmq-core (>= 1.0.1)
+    ffi-rzmq-core (1.0.4)
+      ffi (~> 1.9)
     method_source (0.8.2)
     pry (0.9.12.6)
       coderay (~> 1.0)
@@ -17,6 +22,10 @@ PLATFORMS
 
 DEPENDENCIES
   benchmark-ips
+  ffi-rzmq
   pry
   rack
   redis
+
+BUNDLED WITH
+   1.10.6
